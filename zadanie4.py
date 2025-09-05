@@ -1,112 +1,75 @@
 import sys
-from PyQt6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLineEdit, QLabel
-)
-
-# Словарь с азбукой Морзе для латинских букв A-Z
-MORSE_CODE = {
-    'A': '.-',   'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.',
-    'F': '..-.', 'G': '--.',  'H': '....', 'I': '..',  'J': '.---',
-    'K': '-.-',  'L': '.-..', 'M': '--',   'N': '-.',  'O': '---',
-    'P': '.--.', 'Q': '--.-', 'R': '.-.',  'S': '...', 'T': '-',
-    'U': '..-',  'V': '...-', 'W': '.--',  'X': '-..-', 'Y': '-.--',
-    'Z': '--..'
-}
-
+from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QVBoxLayout, QGridLayout
 
 class MorseCodeApp(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
-
+        
     def initUI(self):
-        # Устанавливаем заголовок окна
-        self.setWindowTitle('Азбука Морзе — Пишем кнопками')
+        self.setGeometry(300, 300, 400, 300)
+        self.setWindowTitle('Азбука Морзе')
 
-        # Основной вертикальный макет
-        layout = QVBoxLayout()
+        main_layout = QVBoxLayout()
 
-        # Подпись к полю ввода
-        label = QLabel('Текст в азбуке Морзе:')
-        layout.addWidget(label)
+        self.morse_display = QLineEdit()
+        self.morse_display.setReadOnly(True) 
+        self.morse_display.setPlaceholderText("Код Морзе появится здесь...")
+        main_layout.addWidget(self.morse_display)
 
-        # Поле для вывода кода Морзе
-        self.morse_display = QLineEdit(self)
-        self.morse_display.setReadOnly(True)  # Только для чтения
-        self.morse_display.setPlaceholderText('Здесь будет код Морзе...')
-        layout.addWidget(self.morse_display)
-
-        # Создаём сетку для кнопок (например, 5 столбцов)
-        grid_layout = QHBoxLayout()
-        row_layout = QHBoxLayout()
-        buttons_per_row = 9  # Сколько кнопок в ряду
-
-        # Проходим по всем латинским буквам от A до Z
-        for i, letter in enumerate('ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
-            # Создаём кнопку с буквой
-            btn = QPushButton(letter, self)
-
-            # Подключаем нажатие кнопки к обработчику, передавая букву через lambda
-            btn.clicked.connect(lambda ch, l=letter: self.add_morse_code(l))
-
-            # Добавляем кнопку в текущую строку
-            row_layout.addWidget(btn)
-
-            # Если в строке уже buttons_per_row кнопок — начинаем новую строку
-            if (i + 1) % buttons_per_row == 0:
-                grid_layout.addLayout(row_layout)
-                row_layout = QHBoxLayout()  # Новая строка
-
-        # Добавляем остаток (если есть)
-        if not row_layout.isEmpty():
-            grid_layout.addLayout(row_layout)
-
-        # Добавляем сетку кнопок в основной макет
-        layout.addLayout(grid_layout)
-
-        # Кнопка "Очистить" (опционально)
-        clear_btn = QPushButton('Очистить', self)
+        grid_layout = QGridLayout()
+        
+        # Словарь с азбукой Морзе
+        self.morse_dict = {
+            'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.',
+            'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---',
+            'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---',
+            'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-',
+            'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 'Z': '--..'
+        }
+        
+        row, col = 0, 0
+        for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+            btn = QPushButton(letter)
+            
+            btn.clicked.connect(lambda checked, l=letter: self.add_morse_code(l))
+        
+            grid_layout.addWidget(btn, row, col)
+            
+            col += 1
+            if col > 7:
+                col = 0
+                row += 1
+        
+        main_layout.addLayout(grid_layout)
+        
+        clear_btn = QPushButton("Очистить")
         clear_btn.clicked.connect(self.clear_display)
-        layout.addWidget(clear_btn)
+        main_layout.addWidget(clear_btn)
 
-        # Устанавливаем макет окну
-        self.setLayout(layout)
-
-        # Устанавливаем размер окна
-        self.resize(800, 300)
-
-        # Показываем окно
+        self.setLayout(main_layout)
+        
         self.show()
-
+    
     def add_morse_code(self, letter):
-        """
-        Добавляет код буквы в поле ввода.
-        :param letter: символ латинской буквы (например, 'A')
-        """
-        # Получаем код Морзе для буквы
-        code = MORSE_CODE.get(letter.upper(), '?')  # если вдруг нет — ставим ?
-
-        # Получаем текущий текст из поля
+        code = self.morse_dict[letter]
+        
         current_text = self.morse_display.text()
-
-        # Если поле не пустое — добавляем пробел перед новым кодом
-        separator = ' ' if current_text else ''
-
-        # Обновляем текст
-        self.morse_display.setText(current_text + separator + code)
-
+        
+        if current_text:
+            new_text = f"{current_text} {code}"
+        else:
+            new_text = code
+        
+        self.morse_display.setText(new_text)
+    
     def clear_display(self):
-        """Очищает поле ввода."""
+        """Очищает поле отображения кода Морзе"""
         self.morse_display.clear()
 
 
-# Основная функция запуска приложения
-def main():
-    app = QApplication(sys.argv)
-    window = MorseCodeApp()
-    sys.exit(app.exec_())
-
-
 if __name__ == '__main__':
-    main()
+    app = QApplication(sys.argv)
+    ex = MorseCodeApp()
+    ex.show()
+    sys.exit(app.exec())

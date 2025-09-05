@@ -31,10 +31,7 @@ class word_switch(QWidget):
         
         # Буллево значение направления (True = input1 → input2, False = input2 → input1)
         self.direction_forward = True
-        
-        # Показываем окно
-        self.show()
-    
+            
     def transfer_text(self):
         if self.direction_forward:
             # Перекидываем из первого поля во второе
@@ -56,4 +53,5 @@ class word_switch(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = word_switch()
+    ex.show()
     sys.exit(app.exec())
