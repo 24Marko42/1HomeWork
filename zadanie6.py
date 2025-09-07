@@ -40,9 +40,9 @@ class Calculator(QWidget):
             # Обработчик нажатия
             if button == '=':
                 btn.clicked.connect(self.calculate)
-            elif button == 'D':  # Обработчик для backspace
+            elif button == 'D':  
                 btn.clicked.connect(self.backspace)
-            elif button == 'C':  # Обработчик для очистки
+            elif button == 'C':  
                 btn.clicked.connect(self.clear)
             else:
                 btn.clicked.connect(lambda _, b=button: self.append_expression(b))

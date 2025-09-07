@@ -16,8 +16,8 @@ class RestaurantOrder(QWidget):
         
         # Cписок блюд с ценами
         self.menu_items = [
-            ("Pivo", 150),
-            ("Viski", 200),
+            ("Tea", 150),
+            ("Mors", 200),
             ("Stake", 600),
             ("Salat", 250),
             ("Coffee", 70)
@@ -48,7 +48,6 @@ class RestaurantOrder(QWidget):
                 lambda state, sb=spinbox: sb.setEnabled(state == 2)
             )
             
-            # 8. Если количество изменяется, устанавливаем чекбокс
             spinbox.valueChanged.connect(
                 lambda value, cb=checkbox: cb.setChecked(value > 0)
             )
@@ -67,7 +66,7 @@ class RestaurantOrder(QWidget):
         
         self.setLayout(main_layout)
         
-        # Инициализируем чек
+        # Чек
         self.update_bill()
 
     def update_bill(self):
